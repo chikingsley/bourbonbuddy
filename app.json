@@ -36,6 +36,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "305af00a-d659-4618-b55a-8c97d4e02b9d"
+      }
+    },
+    "owner": "simonpeacocks"
   }
 }
