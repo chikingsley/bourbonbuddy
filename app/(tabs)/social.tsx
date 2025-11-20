@@ -1,9 +1,9 @@
-import { View, Text } from 'tamagui';
+import { View, Text } from 'react-native';
 
 export default function SocialScreen() {
   return (
-    <View flex={1} justifyContent="center" alignItems="center" backgroundColor="white">
-      <Text fontSize={18}>Social</Text>
+    <View className="flex-1 justify-center items-center bg-white">
+      <Text className="text-lg text-gray-900">Social</Text>
     </View>
   );
 }

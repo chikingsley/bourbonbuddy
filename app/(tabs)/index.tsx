@@ -1,29 +1,14 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View } from "react-native";
 
 export default function CollectionScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Bourbon Collection</Text>
-      <Text style={styles.subtitle}>Start adding your favorite bourbons!</Text>
+    <View className="flex-1 justify-center items-center bg-white">
+      <Text className="text-2xl font-bold mb-2 text-gray-900">
+        My Bourbon Collection
+      </Text>
+      <Text className="text-base text-gray-600">
+        Start adding your favorite bourbons!
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: '#FFFFFF',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 8,
-    color: '#1F2937',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-  },
-});
