@@ -1,0 +1,151 @@
+import * as SQLite from 'expo-sqlite';
+import { createTablesSQL } from './schema';
+import { getSeedSQL } from './seed';
+
+let db: SQLite.SQLiteDatabase | null = null;
+
+export const initDatabase = async (): Promise<SQLite.SQLiteDatabase> => {
+  if (db) return db;
+
+  try {
+    db = await SQLite.openDatabaseAsync('bourbonbuddy.db');
+
+    // Create tables
+    await db.execAsync(createTablesSQL);
+
+    // Check if we need to seed data
+    const result = await db.getFirstAsync<{ count: number }>('SELECT COUNT(*) as count FROM bourbons');
+
+    if (result && result.count === 0) {
+      console.log('Seeding database with bourbon data...');
+      await db.execAsync(getSeedSQL());
+      console.log('Database seeded successfully!');
+    }
+
+    return db;
+  } catch (error) {
+    console.error('Error initializing database:', error);
+    throw error;
+  }
+};
+
+export const getDatabase = (): SQLite.SQLiteDatabase => {
+  if (!db) {
+    throw new Error('Database not initialized. Call initDatabase() first.');
+  }
+  return db;
+};
+
+// Bourbon queries
+export interface Bourbon {
+  id: number;
+  name: string;
+  distillery: string;
+  type: 'bourbon' | 'rye' | 'wheat' | 'malt' | 'blend';
+  proof: number;
+  age_statement?: string;
+  msrp?: number;
+  rarity: 'common' | 'uncommon' | 'rare' | 'allocated';
+  description: string;
+  image_url: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Collection {
+  id: number;
+  bourbon_id: number;
+  purchase_date?: string;
+  purchase_price?: number;
+  purchase_location?: string;
+  notes?: string;
+  rating?: number;
+  created_at: string;
+}
+
+export interface BourbonWithCollection extends Bourbon {
+  in_collection: boolean;
+  collection_id?: number;
+  collection_notes?: string;
+  collection_rating?: number;
+}
+
+export const getAllBourbons = async (): Promise<Bourbon[]> => {
+  const database = getDatabase();
+  return await database.getAllAsync<Bourbon>('SELECT * FROM bourbons ORDER BY name ASC');
+};
+
+export const getBourbonById = async (id: number): Promise<Bourbon | null> => {
+  const database = getDatabase();
+  return await database.getFirstAsync<Bourbon>('SELECT * FROM bourbons WHERE id = ?', [id]);
+};
+
+export const searchBourbons = async (query: string): Promise<Bourbon[]> => {
+  const database = getDatabase();
+  const searchQuery = `%${query}%`;
+  return await database.getAllAsync<Bourbon>(
+    'SELECT * FROM bourbons WHERE name LIKE ? OR distillery LIKE ? ORDER BY name ASC',
+    [searchQuery, searchQuery]
+  );
+};
+
+export const getBourbonsByRarity = async (rarity: string): Promise<Bourbon[]> => {
+  const database = getDatabase();
+  return await database.getAllAsync<Bourbon>(
+    'SELECT * FROM bourbons WHERE rarity = ? ORDER BY name ASC',
+    [rarity]
+  );
+};
+
+// Collection queries
+export const getUserCollection = async (): Promise<BourbonWithCollection[]> => {
+  const database = getDatabase();
+  return await database.getAllAsync<BourbonWithCollection>(`
+    SELECT
+      b.*,
+      1 as in_collection,
+      c.id as collection_id,
+      c.notes as collection_notes,
+      c.rating as collection_rating,
+      c.purchase_date,
+      c.purchase_price,
+      c.purchase_location
+    FROM bourbons b
+    INNER JOIN collections c ON b.id = c.bourbon_id
+    ORDER BY b.name ASC
+  `);
+};
+
+export const addToCollection = async (bourbonId: number): Promise<void> => {
+  const database = getDatabase();
+  await database.runAsync(
+    'INSERT OR IGNORE INTO collections (bourbon_id) VALUES (?)',
+    [bourbonId]
+  );
+};
+
+export const removeFromCollection = async (bourbonId: number): Promise<void> => {
+  const database = getDatabase();
+  await database.runAsync('DELETE FROM collections WHERE bourbon_id = ?', [bourbonId]);
+};
+
+export const updateCollectionNotes = async (
+  bourbonId: number,
+  notes: string,
+  rating?: number
+): Promise<void> => {
+  const database = getDatabase();
+  await database.runAsync(
+    'UPDATE collections SET notes = ?, rating = ? WHERE bourbon_id = ?',
+    [notes, rating || null, bourbonId]
+  );
+};
+
+export const isInCollection = async (bourbonId: number): Promise<boolean> => {
+  const database = getDatabase();
+  const result = await database.getFirstAsync<{ count: number }>(
+    'SELECT COUNT(*) as count FROM collections WHERE bourbon_id = ?',
+    [bourbonId]
+  );
+  return (result?.count || 0) > 0;
+};

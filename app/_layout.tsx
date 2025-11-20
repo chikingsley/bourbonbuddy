@@ -1,4 +1,6 @@
 import '../global.css';
+import { useEffect, useState } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { Tabs } from 'expo-router';
 import {
   BookOpen,
@@ -8,6 +10,7 @@ import {
   User
 } from 'lucide-react-native';
 import { iconWithClassName } from '@/lib/icons/iconWithClassName';
+import { initDatabase } from '@/lib/db/client';
 
 iconWithClassName(BookOpen);
 iconWithClassName(Compass);
@@ -16,6 +19,28 @@ iconWithClassName(Users);
 iconWithClassName(User);
 
 export default function TabsLayout() {
+  const [isDbReady, setIsDbReady] = useState(false);
+
+  useEffect(() => {
+    const setupDatabase = async () => {
+      try {
+        await initDatabase();
+        setIsDbReady(true);
+      } catch (error) {
+        console.error('Failed to initialize database:', error);
+      }
+    };
+
+    setupDatabase();
+  }, []);
+
+  if (!isDbReady) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#7C3AED" />
+      </View>
+    );
+  }
   return (
     <Tabs
       screenOptions={{
