@@ -1,0 +1,8 @@
+appId: com.bourbonbuddy.app
+---
+# Test: Launch app and verify database initialization
+- launchApp
+- assertVisible: "My Collection|Discover|Add|Social|Profile"
+- tapOn: "Discover"
+- assertVisible: "Discover"
+- assertVisible: "Search bourbons..."

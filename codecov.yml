@@ -1,0 +1,38 @@
+codecov:
+  require_ci_to_pass: yes
+  notify:
+    after_n_builds: 1
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 1%
+        if_ci_failed: error
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+        if_ci_failed: error
+
+comment:
+  layout: "reach,diff,flags,tree,reach"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: yes
+
+ignore:
+  - "**/*.test.tsx"
+  - "**/*.test.ts"
+  - "**/__tests__/**"
+  - "**/app-example/**"
+  - "**/*.config.js"
+  - "**/*.config.ts"
+  - "**/babel.config.js"
+  - "**/metro.config.js"
+  - "**/tailwind.config.js"

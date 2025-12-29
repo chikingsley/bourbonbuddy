@@ -1,0 +1,30 @@
+appId: com.bourbonbuddy.app
+---
+# Test: Navigate between tabs
+- launchApp
+- assertVisible: "My Collection"
+
+# Test Collection tab
+- tapOn: "Collection"
+- assertVisible: "Your Collection is Empty|My Collection"
+
+# Test Discover tab
+- tapOn: "Discover"
+- assertVisible: "Discover"
+- assertVisible: "Search bourbons..."
+
+# Test Add tab
+- tapOn: "Add"
+- assertVisible: "Add"
+
+# Test Social tab
+- tapOn: "Social"
+- assertVisible: "Social"
+
+# Test Profile tab
+- tapOn: "Profile"
+- assertVisible: "Profile"
+
+# Return to Collection
+- tapOn: "Collection"
+- assertVisible: "My Collection"

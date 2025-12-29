@@ -1,0 +1,14 @@
+appId: com.bourbonbuddy.app
+---
+# Test: Search for bourbons
+- launchApp
+- tapOn: "Discover"
+- assertVisible: "Buffalo Trace"
+- assertVisible: "Maker's Mark"
+- tapOn: "Search bourbons..."
+- inputText: "Buffalo"
+- assertVisible: "Buffalo Trace"
+- assertNotVisible: "Maker's Mark"
+- tapOn:
+    id: "clear-search-button"
+- assertVisible: "Maker's Mark"
