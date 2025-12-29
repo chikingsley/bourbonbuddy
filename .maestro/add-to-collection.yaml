@@ -1,0 +1,48 @@
+appId: com.bourbonbuddy.app
+---
+# Test: Add to Collection Flow
+- launchApp
+- assertVisible: "Add to Collection"
+
+# Navigate to Add tab
+- tapOn: "Add"
+- assertVisible: "Add to Collection"
+- assertVisible: "Search bourbons..."
+
+# Verify bourbons are displayed
+- assertVisible:
+    text: "Buffalo Trace|Maker's Mark|Woodford Reserve"
+    regex: true
+
+# Find and tap "Add to Collection" button on first bourbon
+- tapOn: "Add to Collection"
+
+# Verify notes modal appears
+- assertVisible: "Rating (Optional)"
+- assertVisible: "Notes (Optional)"
+
+# Add a 4-star rating
+- tapOn:
+    id: ".*star.*4"
+    regex: true
+
+# Add notes
+- tapOn: "Add your tasting notes"
+- inputText: "Great bourbon for the price. Smooth and flavorful."
+
+# Tap Add button
+- tapOn:
+    text: "Add to Collection"
+    index: 1
+
+# Verify modal closes and button changes to "In Collection"
+- assertVisible: "In Collection"
+
+# Navigate to Collection tab
+- tapOn: "My Collection"
+- assertVisible: "My Collection"
+- assertVisible: "1 bourbon"
+
+# Verify the bourbon appears in collection
+- assertVisible: "My Notes"
+- assertVisible: "Great bourbon for the price"

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
-import { BourbonCard } from '@/components/ui/bourbon-card';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { CollectionBourbonCard } from '@/components/ui/collection-bourbon-card';
 import { getUserCollection, type BourbonWithCollection } from '@/lib/db/client';
 
 export default function CollectionScreen() {
@@ -21,9 +21,12 @@ export default function CollectionScreen() {
     }
   };
 
-  useEffect(() => {
-    loadCollection();
-  }, []);
+  // Reload collection when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadCollection();
+    }, [])
+  );
 
   return (
     <View className="flex-1 bg-gray-50">
@@ -60,9 +63,9 @@ export default function CollectionScreen() {
           data={collection}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <BourbonCard
+            <CollectionBourbonCard
               bourbon={item}
-              showRarity={false}
+              onUpdate={loadCollection}
             />
           )}
           contentContainerClassName="p-4"
