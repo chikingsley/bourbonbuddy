@@ -1,19 +1,16 @@
-import { describe, it, expect, beforeAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, mock } from 'bun:test';
+import { initDatabase, getAllBourbons } from '../client';
 
 // Mock expo-sqlite
-jest.mock('expo-sqlite', () => ({
-  openDatabaseAsync: jest.fn(() =>
+mock.module('expo-sqlite', () => ({
+  openDatabaseAsync: () =>
     Promise.resolve({
-      execAsync: jest.fn(),
-      getFirstAsync: jest.fn(() => Promise.resolve({ count: 0 })),
-      getAllAsync: jest.fn(() => Promise.resolve([])),
-      runAsync: jest.fn(),
-    })
-  ),
+      execAsync: () => Promise.resolve(),
+      getFirstAsync: () => Promise.resolve({ count: 0 }),
+      getAllAsync: () => Promise.resolve([]),
+      runAsync: () => Promise.resolve(),
+    }),
 }));
-
-// Import after mocking
-import { initDatabase, getAllBourbons } from '../client';
 
 describe('Database Client', () => {
   beforeAll(async () => {
@@ -22,7 +19,8 @@ describe('Database Client', () => {
 
   describe('initDatabase', () => {
     it('should initialize database without errors', async () => {
-      await expect(initDatabase()).resolves.toBeDefined();
+      const db = await initDatabase();
+      expect(db).toBeDefined();
     });
   });
 

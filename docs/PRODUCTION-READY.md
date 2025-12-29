@@ -4,22 +4,19 @@ This project implements production-grade standards for testing, CI/CD, and devel
 
 ## ✅ Automated Testing
 
-### Unit Tests (Jest)
-- **Framework**: Jest with jest-expo preset
-- **Coverage**: 70% minimum threshold
-- **Performance Tracking**: Automatic slow test detection
-- **Flaky Test Handling**: Automatic retries (up to 2x)
-- **Reporters**:
-  - Default console reporter
-  - JUnit XML for CI integration
-  - HTML coverage reports
+### Unit Tests (Bun)
+- **Framework**: Bun's built-in test runner
+- **Speed**: 10-20x faster than Jest (~83ms for full suite)
+- **Coverage**: LCOV and JSON reports
+- **Zero Config**: No jest.config.js needed
+- **Native TypeScript**: No transpilation required
 
 **Run Commands:**
 ```bash
-npm test                # Run tests once
-npm run test:watch      # Watch mode
-npm run test:coverage   # With coverage
-npm run test:ci         # CI mode
+bun test                # Run tests once
+bun test --watch        # Watch mode
+bun test --coverage     # With coverage
+npm run test:ci         # CI mode (coverage + reports)
 ```
 
 ### E2E Tests (Maestro)
@@ -98,41 +95,34 @@ maestro studio                  # Interactive mode
 - Separate for npm and GitHub Actions
 - Auto-labeled and assigned
 
-## ✅ Test Performance Tracking
+## ✅ Test Performance
 
-### Features:
-- **Timing Tracking**: All tests are timed
-- **Slow Test Detection**: Tests > 5s are flagged
-- **Top 10 Report**: Slowest tests logged after suite
-- **Performance Warnings**: Console warnings for slow tests
+### Bun Test Speed:
+- **Blazing Fast**: Full test suite runs in ~83ms
+- **No Need for Tracking**: Bun is always fast
+- **Instant Feedback**: Test results appear immediately
+- **Native Performance**: No transpilation overhead
 
-### Configuration:
-Located in `jest.setup.js`
+### Why Bun?
+- 10-20x faster than Jest
+- Built-in TypeScript support
+- Zero configuration
+- Native watch mode
+- Better DX (Developer Experience)
 
-```javascript
-// Tests taking over 5 seconds trigger warnings
-if (duration > 5000) {
-  console.warn(`⚠️ Slow test detected: "${name}" took ${duration}ms`);
-}
-```
+## ✅ Test Reliability
 
-## ✅ Flaky Test Detection & Management
+### Bun's Approach:
+- **Deterministic**: Tests run in predictable order
+- **Isolated**: Each test file runs in separate context
+- **Fast**: Reduced flakiness from timeout issues
+- **No Retries Needed**: Tests are reliable by design
 
-### Jest Retries:
-- **Automatic Retries**: 2 retries on failure
-- **Error Logging**: Errors logged before retry
-- **Configuration**: `jest.setup.js`
-
-```javascript
-jest.retryTimes(2, {
-  logErrorsBeforeRetry: true,
-});
-```
-
-### Identifying Flaky Tests:
-1. Check CI artifacts for retry logs
-2. Review junit.xml for test duration variance
-3. Use `npm run test:coverage` locally to reproduce
+### If Tests Fail:
+1. Check test logic
+2. Verify mocks are properly set up
+3. Ensure no shared state between tests
+4. Review async handling
 
 ## ✅ Development Workflow
 

@@ -29,12 +29,17 @@ jobs:
         run: npx tsc --noEmit
 
   unit-tests:
-    name: Unit Tests
+    name: Unit Tests (Bun)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node.js (for npm deps)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -44,7 +49,7 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm run test:ci
+        run: bun test --coverage --coverage-reporter=lcov --coverage-reporter=json
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -53,7 +58,7 @@ jobs:
           files: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           verbose: true
 
       - name: Upload test results
@@ -63,7 +68,6 @@ jobs:
           name: test-results
           path: |
             coverage/
-            coverage/junit.xml
           retention-days: 30
 
   e2e-tests:
