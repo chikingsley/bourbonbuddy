@@ -231,3 +231,89 @@ export const isInCollection = async (bourbonId: number): Promise<boolean> => {
   );
   return (result?.count || 0) > 0;
 };
+
+// Statistics queries
+export interface CollectionStats {
+  totalBourbons: number;
+  totalValue: number;
+  averageRating: number;
+  averageProof: number;
+  typeBreakdown: { type: string; count: number }[];
+  rarityBreakdown: { rarity: string; count: number }[];
+  recentAdditions: BourbonWithCollection[];
+}
+
+export const getCollectionStats = async (): Promise<CollectionStats> => {
+  const database = getDatabase();
+
+  // Get total count
+  const totalResult = await database.getFirstAsync<{ count: number }>(
+    'SELECT COUNT(*) as count FROM collections'
+  );
+  const totalBourbons = totalResult?.count || 0;
+
+  // Get total value
+  const valueResult = await database.getFirstAsync<{ total: number }>(
+    `SELECT SUM(b.msrp) as total
+     FROM collections c
+     INNER JOIN bourbons b ON c.bourbon_id = b.id`
+  );
+  const totalValue = valueResult?.total || 0;
+
+  // Get average rating
+  const ratingResult = await database.getFirstAsync<{ avg: number }>(
+    'SELECT AVG(rating) as avg FROM collections WHERE rating IS NOT NULL'
+  );
+  const averageRating = ratingResult?.avg || 0;
+
+  // Get average proof
+  const proofResult = await database.getFirstAsync<{ avg: number }>(
+    `SELECT AVG(b.proof) as avg
+     FROM collections c
+     INNER JOIN bourbons b ON c.bourbon_id = b.id`
+  );
+  const averageProof = proofResult?.avg || 0;
+
+  // Get type breakdown
+  const typeBreakdown = await database.getAllAsync<{ type: string; count: number }>(
+    `SELECT b.type, COUNT(*) as count
+     FROM collections c
+     INNER JOIN bourbons b ON c.bourbon_id = b.id
+     GROUP BY b.type
+     ORDER BY count DESC`
+  );
+
+  // Get rarity breakdown
+  const rarityBreakdown = await database.getAllAsync<{ rarity: string; count: number }>(
+    `SELECT b.rarity, COUNT(*) as count
+     FROM collections c
+     INNER JOIN bourbons b ON c.bourbon_id = b.id
+     GROUP BY b.rarity
+     ORDER BY count DESC`
+  );
+
+  // Get recent additions (last 5)
+  const recentAdditions = await database.getAllAsync<BourbonWithCollection>(
+    `SELECT
+      b.*,
+      1 as in_collection,
+      c.id as collection_id,
+      c.notes as collection_notes,
+      c.rating as collection_rating,
+      c.created_at
+    FROM collections c
+    INNER JOIN bourbons b ON c.bourbon_id = b.id
+    ORDER BY c.created_at DESC
+    LIMIT 5`
+  );
+
+  return {
+    totalBourbons,
+    totalValue,
+    averageRating,
+    averageProof,
+    typeBreakdown,
+    rarityBreakdown,
+    recentAdditions,
+  };
+};

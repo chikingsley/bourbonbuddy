@@ -1,0 +1,34 @@
+appId: com.bourbonbuddy.app
+---
+# Test: Profile Screen Statistics
+- launchApp
+- assertVisible: "Profile"
+
+# Navigate to Profile tab
+- tapOn: "Profile"
+- assertVisible: "My Profile"
+- assertVisible: "Bourbon Enthusiast"
+
+# Verify stats cards are displayed
+- assertVisible: "Total Bourbons"
+- assertVisible: "Collection Value"
+- assertVisible: "Avg Rating"
+- assertVisible: "Avg Proof"
+
+# Verify breakdown sections if collection exists
+- assertVisible:
+    text: "Collection by Type|Collection by Rarity"
+    regex: true
+    optional: true
+
+# Test share collection
+- tapOn: "Share Collection"
+# Share sheet should appear (platform-specific)
+
+# Test export collection
+- tapOn: "Export Collection"
+- assertVisible: "Export Collection"
+- tapOn: "OK"
+
+# Verify settings button exists
+- assertVisible: "Settings"

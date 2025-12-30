@@ -1,0 +1,38 @@
+appId: com.bourbonbuddy.app
+---
+# Test: Social Feed and Community
+- launchApp
+- assertVisible: "Social"
+
+# Navigate to Social tab
+- tapOn: "Social"
+- assertVisible: "Community"
+
+# Verify community stats
+- assertVisible: "Members"
+- assertVisible: "Bourbons"
+- assertVisible: "Reviews"
+
+# Verify trending section
+- assertVisible: "Trending This Week"
+
+# Verify activity feed
+- assertVisible: "Recent Activity"
+
+# Verify at least one activity card
+- assertVisible:
+    text: "added to collection|rated|reviewed"
+    regex: true
+
+# Test trending bourbon navigation
+- tapOn:
+    text: "Buffalo Trace|Maker's Mark|Woodford Reserve"
+    regex: true
+    index: 0
+    optional: true
+
+# Should navigate to bourbon detail
+- assertVisible:
+    text: "Specifications|Description"
+    regex: true
+    optional: true
