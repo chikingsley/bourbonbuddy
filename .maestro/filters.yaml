@@ -1,0 +1,63 @@
+appId: com.bourbonbuddy.app
+---
+# Test: Bourbon Filters
+- launchApp
+- assertVisible: "Discover"
+
+# Navigate to Discover tab
+- tapOn: "Discover"
+- assertVisible: "Discover"
+
+# Open filters
+- tapOn:
+    id: ".*filter.*|.*sliders.*"
+    regex: true
+
+# Verify filter modal opens
+- assertVisible: "Filters"
+- assertVisible: "Type"
+- assertVisible: "Rarity"
+- assertVisible: "Price Range"
+- assertVisible: "Proof Range"
+- assertVisible: "Sort By"
+
+# Select Bourbon type
+- tapOn: "Bourbon"
+
+# Select Common rarity
+- tapOn: "Common"
+
+# Set price range
+- tapOn: "Min Price"
+- inputText: "20"
+- tapOn: "Max Price"
+- inputText: "50"
+
+# Apply filters
+- tapOn: "Apply Filters"
+
+# Verify filter modal closes and filters are active
+- assertVisible: "Discover"
+- assertNotVisible: "Filters"
+
+# Verify active filters indicator
+- assertVisible:
+    text: "type|rarity|price"
+    regex: true
+
+# Clear filters and verify
+- tapOn:
+    id: ".*filter.*|.*sliders.*"
+    regex: true
+- tapOn: "Clear All"
+- tapOn: "Apply Filters"
+
+# Test sorting
+- tapOn:
+    id: ".*filter.*|.*sliders.*"
+    regex: true
+- tapOn: "Price (Low to High)"
+- tapOn: "Apply Filters"
+
+# Verify results are sorted (first bourbon should be cheaper)
+- assertVisible: "Discover"

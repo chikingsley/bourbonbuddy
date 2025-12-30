@@ -97,6 +97,88 @@ export const getBourbonsByRarity = async (rarity: string): Promise<Bourbon[]> =>
   );
 };
 
+export interface BourbonFilters {
+  types?: string[];
+  rarities?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  minProof?: number;
+  maxProof?: number;
+  sortBy?: 'name' | 'price_asc' | 'price_desc' | 'proof_asc' | 'proof_desc';
+}
+
+export const getFilteredBourbons = async (
+  filters: BourbonFilters,
+  searchQuery?: string
+): Promise<Bourbon[]> => {
+  const database = getDatabase();
+  let query = 'SELECT * FROM bourbons WHERE 1=1';
+  const params: any[] = [];
+
+  // Search query
+  if (searchQuery && searchQuery.trim().length > 0) {
+    query += ' AND (name LIKE ? OR distillery LIKE ?)';
+    const searchPattern = `%${searchQuery}%`;
+    params.push(searchPattern, searchPattern);
+  }
+
+  // Type filter
+  if (filters.types && filters.types.length > 0) {
+    const placeholders = filters.types.map(() => '?').join(',');
+    query += ` AND type IN (${placeholders})`;
+    params.push(...filters.types);
+  }
+
+  // Rarity filter
+  if (filters.rarities && filters.rarities.length > 0) {
+    const placeholders = filters.rarities.map(() => '?').join(',');
+    query += ` AND rarity IN (${placeholders})`;
+    params.push(...filters.rarities);
+  }
+
+  // Price range filter
+  if (filters.minPrice !== undefined && filters.minPrice > 0) {
+    query += ' AND msrp >= ?';
+    params.push(filters.minPrice);
+  }
+  if (filters.maxPrice !== undefined && filters.maxPrice > 0) {
+    query += ' AND msrp <= ?';
+    params.push(filters.maxPrice);
+  }
+
+  // Proof range filter
+  if (filters.minProof !== undefined && filters.minProof > 0) {
+    query += ' AND proof >= ?';
+    params.push(filters.minProof);
+  }
+  if (filters.maxProof !== undefined && filters.maxProof > 0) {
+    query += ' AND proof <= ?';
+    params.push(filters.maxProof);
+  }
+
+  // Sorting
+  switch (filters.sortBy) {
+    case 'price_asc':
+      query += ' ORDER BY msrp ASC, name ASC';
+      break;
+    case 'price_desc':
+      query += ' ORDER BY msrp DESC, name ASC';
+      break;
+    case 'proof_asc':
+      query += ' ORDER BY proof ASC, name ASC';
+      break;
+    case 'proof_desc':
+      query += ' ORDER BY proof DESC, name ASC';
+      break;
+    case 'name':
+    default:
+      query += ' ORDER BY name ASC';
+      break;
+  }
+
+  return await database.getAllAsync<Bourbon>(query, params);
+};
+
 // Collection queries
 export const getUserCollection = async (): Promise<BourbonWithCollection[]> => {
   const database = getDatabase();

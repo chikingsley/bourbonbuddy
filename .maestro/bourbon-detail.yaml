@@ -1,0 +1,67 @@
+appId: com.bourbonbuddy.app
+---
+# Test: Bourbon Detail Screen
+- launchApp
+- assertVisible: "Discover"
+
+# Navigate to Discover tab
+- tapOn: "Discover"
+- assertVisible: "Discover"
+
+# Tap on first bourbon card to open detail screen
+- tapOn:
+    text: "Buffalo Trace|Maker's Mark|Woodford Reserve"
+    regex: true
+    index: 0
+
+# Verify detail screen loads
+- assertVisible: "Specifications"
+- assertVisible: "Description"
+- assertVisible: "Type"
+- assertVisible: "Proof"
+
+# Verify bourbon name and distillery are shown
+- assertVisible:
+    text: "Buffalo Trace|Maker's Mark|Woodford Reserve|Distillery"
+    regex: true
+
+# Test Add to Collection from detail screen
+- tapOn: "Add to Collection"
+
+# Verify modal appears
+- assertVisible: "Rating (Optional)"
+- assertVisible: "Notes (Optional)"
+
+# Add 5-star rating
+- tapOn:
+    id: ".*star.*5"
+    regex: true
+
+# Add notes
+- tapOn: "Add your tasting notes"
+- inputText: "Excellent bourbon. Rich caramel and vanilla notes."
+
+# Submit
+- tapOn:
+    text: "Add to Collection"
+    index: 1
+
+# Verify buttons change after adding
+- assertVisible: "Remove from Collection"
+- assertVisible: "Edit"
+
+# Verify notes section appears
+- assertVisible: "My Notes"
+- assertVisible: "Excellent bourbon"
+
+# Go back to list
+- tapOn:
+    id: ".*back.*|.*arrow.*left.*"
+    regex: true
+
+# Navigate to Collection tab
+- tapOn: "My Collection"
+- assertVisible: "My Collection"
+
+# Verify bourbon appears in collection
+- assertVisible: "Excellent bourbon"

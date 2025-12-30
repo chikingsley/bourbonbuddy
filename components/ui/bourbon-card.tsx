@@ -1,4 +1,5 @@
 import { View, Text, Image, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 import type { Bourbon } from '@/lib/db/client';
 import { cn } from '@/lib/utils';
 
@@ -16,9 +17,19 @@ const rarityColors = {
 };
 
 export function BourbonCard({ bourbon, onPress, showRarity = true }: BourbonCardProps) {
+  const router = useRouter();
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push(`/bourbon/${bourbon.id}`);
+    }
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden active:opacity-70"
     >
       <Image

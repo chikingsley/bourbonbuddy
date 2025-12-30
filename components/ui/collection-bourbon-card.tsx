@@ -9,6 +9,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Star, Edit2, X, Trash2 } from 'lucide-react-native';
 import type { BourbonWithCollection } from '@/lib/db/client';
 import { updateCollectionNotes, removeFromCollection } from '@/lib/db/client';
@@ -20,6 +21,7 @@ interface CollectionBourbonCardProps {
 }
 
 export function CollectionBourbonCard({ bourbon, onUpdate }: CollectionBourbonCardProps) {
+  const router = useRouter();
   const [showEditModal, setShowEditModal] = useState(false);
   const [notes, setNotes] = useState(bourbon.collection_notes || '');
   const [rating, setRating] = useState(bourbon.collection_rating || 0);
@@ -60,7 +62,10 @@ export function CollectionBourbonCard({ bourbon, onUpdate }: CollectionBourbonCa
 
   return (
     <>
-      <View className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <Pressable
+        onPress={() => router.push(`/bourbon/${bourbon.id}`)}
+        className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden active:opacity-70"
+      >
         <Image
           source={{ uri: bourbon.image_url }}
           className="w-full h-40 bg-gray-100"
@@ -128,7 +133,8 @@ export function CollectionBourbonCard({ bourbon, onUpdate }: CollectionBourbonCa
           {/* Action Buttons */}
           <View className="flex-row gap-2">
             <Pressable
-              onPress={() => {
+              onPress={(e) => {
+                e.stopPropagation();
                 setNotes(bourbon.collection_notes || '');
                 setRating(bourbon.collection_rating || 0);
                 setShowEditModal(true);
@@ -139,14 +145,17 @@ export function CollectionBourbonCard({ bourbon, onUpdate }: CollectionBourbonCa
               <Text className="text-white font-semibold ml-1">Edit</Text>
             </Pressable>
             <Pressable
-              onPress={handleRemove}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleRemove();
+              }}
               className="py-2 px-3 rounded-lg border border-red-300 bg-red-50 flex-row items-center justify-center"
             >
               <Trash2 size={16} color="#EF4444" />
             </Pressable>
           </View>
         </View>
-      </View>
+      </Pressable>
 
       {/* Edit Modal */}
       <Modal
